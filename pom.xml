@@ -77,6 +77,17 @@
     <skipUTs>${skipTests}</skipUTs>
   </properties>
 
+  <distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<url>http://nexus:8081/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<url>http://nexus:8081/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+  
   <dependencyManagement>
     <dependencies>
       <!-- Define the version of the JBoss Java EE APIs we want to import. 
