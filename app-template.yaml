@@ -173,5 +173,5 @@ parameters:
   required: true
 - displayName: Application database
   name: DB_DATABASE
-  value: kitchensinkdb
+  value: db
   required: true
