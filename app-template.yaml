@@ -76,7 +76,7 @@ objects:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          name: ${APPLICATION_NAME}-${APPLICATION_ENV}
+          name: ${APPLICATION_NAME}
           ports:
           - containerPort: 8778
             name: jolokia
@@ -126,8 +126,8 @@ objects:
       description: The kitchensink application http port.
       service.alpha.openshift.io/dependencies: '[{"name":"${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql","namespace":"","kind":"Service"}]'
     labels:
-      app: ${APPLICATION_NAME}-${APPLICATION_ENV}
-    name: ${APPLICATION_NAME}-${APPLICATION_ENV}
+      app: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
   spec:
     ports:
     - port: 8080
@@ -144,7 +144,7 @@ objects:
       targetPort: 8080
     to:
       kind: Service
-      name: ${APPLICATION_NAME}-${APPLICATION_ENV}
+      name: ${APPLICATION_NAME}
       weight: 100
 parameters:
 - displayName: Application name
