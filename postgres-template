@@ -1,0 +1,112 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Template
+labels:
+  application: kitchensink-postgres
+metadata:
+  annotations:
+    description: Kitchensink application
+    iconClass: icon-java
+    tags: javaee,jboss,angularjs
+  name: kitchensink-postgres
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The database server's port.
+    labels:
+      application: ${APPLICATION_NAME}-${APPLICATION_ENV}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+  spec:
+    ports:
+    - port: 5432
+      targetPort: 5432
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}-${APPLICATION_ENV}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}-${APPLICATION_ENV}
+          deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+        name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+      spec:
+        containers:
+        - env:
+          - name: POSTGRESQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: db-config
+                key: DB_USERNAME
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: db-config
+                key: DB_PASSWORD
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: db-config
+                key: DB_DATABASE
+          image: postgresql
+          imagePullPolicy: Always
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 5432
+            timeoutSeconds: 1
+          name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+          ports:
+          - containerPort: 5432
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c
+                'SELECT 1'
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+        terminationGracePeriodSeconds: 60
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+        from:
+          kind: ImageStreamTag
+          name: postgresql:latest
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+parameters:
+- displayName: Application name
+  name: APPLICATION_NAME
+  value: ks
+- displayName: Application environment
+  name: APPLICATION_ENV
+  value: test
