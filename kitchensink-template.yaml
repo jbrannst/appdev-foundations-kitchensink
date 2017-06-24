@@ -5,36 +5,36 @@
 apiVersion: v1
 kind: Template
 labels:
-  application: kitchensink
+  application: ${APPLICATION_NAME}-${APPLICATION_ENV}
 metadata:
   annotations:
-    description: Kitchensink application
+    description: ${APPLICATION_NAME}-${APPLICATION_ENV} application
     iconClass: icon-java
     tags: javaee,jboss,angularjs
-  name: kitchensink-deploy
+  name: ${APPLICATION_NAME}-deploy
 objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    name: kitchensink
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}
   spec:
     replicas: 1
     selector:
-      deploymentConfig: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}
     strategy:
       resources: {}
       type: Recreate
     template:
       metadata:
         labels:
-          application: ${APPLICATION_NAME}
-          deploymentConfig: ${APPLICATION_NAME}
-        name: ${APPLICATION_NAME}
+          application: ${APPLICATION_NAME}-${APPLICATION_ENV}
+          deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}
+        name: ${APPLICATION_NAME}-${APPLICATION_ENV}
       spec:
         containers:
         - env:
           - name: OPENSHIFT_KUBE_PING_LABELS
-            value: application=${APPLICATION_NAME}
+            value: application=${APPLICATION_NAME}-${APPLICATION_ENV}
           - name: OPENSHIFT_KUBE_PING_NAMESPACE
             valueFrom:
               fieldRef:
@@ -46,9 +46,9 @@ objects:
           - name: AUTO_DEPLOY_EXPLODED
             value: "false"
           - name: DB_SERVICE_PREFIX_MAPPING
-            value: ${APPLICATION_NAME}-postgresql=DB
+            value: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql=DB
           - name: TX_DATABASE_PREFIX_MAPPING
-            value: ${APPLICATION_NAME}-postgresql=DB
+            value: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql=DB
           - name: DB_JNDI
             value: java:jboss/datasources/KitchensinkAngularJSQuickstartDS
           - name: DB_USERNAME
@@ -57,7 +57,7 @@ objects:
             value: ${DB_PASSWORD}
           - name: DB_DATABASE
             value: ${DB_DATABASE}
-          image: ${APPLICATION_NAME}
+          image: ${APPLICATION_NAME}-${APPLICATION_ENV}
           imagePullPolicy: Always
           lifecycle:
             preStop:
@@ -76,7 +76,7 @@ objects:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          name: ${APPLICATION_NAME}
+          name: ${APPLICATION_NAME}-${APPLICATION_ENV}
           ports:
           - containerPort: 8778
             name: jolokia
@@ -113,7 +113,7 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - ${APPLICATION_NAME}
+        - ${APPLICATION_NAME}-${APPLICATION_ENV}
         from:
           kind: ImageStreamTag
           name: ${APPLICATION_NAME}:${IMAGE_VERSION}
@@ -124,32 +124,35 @@ objects:
   metadata:
     annotations:
       description: The kitchensink application http port.
-      service.alpha.openshift.io/dependencies: '[{"name":"${APPLICATION_NAME}-postgresql","namespace":"","kind":"Service"}]'
+      service.alpha.openshift.io/dependencies: '[{"name":"${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql","namespace":"","kind":"Service"}]'
     labels:
-      app: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}-${APPLICATION_ENV}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}
   spec:
     ports:
     - port: 8080
       protocol: TCP
       targetPort: 8080
     selector:
-      deploymentConfig: ${APPLICATION_NAME}
+      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}
   spec:
     port:
       targetPort: 8080
     to:
       kind: Service
-      name: ${APPLICATION_NAME}
+      name: ${APPLICATION_NAME}-${APPLICATION_ENV}
       weight: 100
 parameters:
 - displayName: Application name
   name: APPLICATION_NAME
   value: kitchensink
+- displayName: Application environment
+  name: APPLICATION_ENV
+  value: test
 - displayName: Image version
   name: IMAGE_VERSION
   value: latest
