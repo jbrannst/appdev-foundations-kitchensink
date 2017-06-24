@@ -229,7 +229,7 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENV}
   spec:
     port:
       targetPort: 8080
