@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Template
+labels:
+  application: kitchensink
+metadata:
+  annotations:
+    description: Kitchensink route
+    iconClass: icon-java
+    tags: javaee,jboss,angularjs
+  name: kitchensink-route
+objects:
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: kitchensink
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: kitchensink-${APPLICATION_ENV}
+      weight: 100
+parameters:
+- displayName: Application env
+  name: APPLICATION_ENV
+  value: blue
