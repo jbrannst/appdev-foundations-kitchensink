@@ -116,7 +116,7 @@ objects:
         - ${APPLICATION_NAME}-${APPLICATION_ENV}
         from:
           kind: ImageStreamTag
-          name: ${APPLICATION_NAME}:${APPLICATION_ENV}
+          name: ${APPLICATION_NAME}:${IMAGE_VERSION}
       type: ImageChange
     - type: ConfigChange
 - apiVersion: v1
@@ -234,6 +234,9 @@ parameters:
 - displayName: Application environment
   name: APPLICATION_ENV
   value: test
+- displayName: Image version
+  name: IMAGE_VERSION
+  value: latest
 - displayName: A-MQ cluster admin password
   from: '[a-zA-Z0-9]{8}'
   generate: expression
