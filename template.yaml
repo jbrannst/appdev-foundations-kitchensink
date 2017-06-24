@@ -240,7 +240,7 @@ objects:
 parameters:
 - displayName: Application name
   name: APPLICATION_NAME
-  value: ks
+  value: kitchensink
 - displayName: Application environment
   name: APPLICATION_ENV
   value: test
