@@ -60,17 +60,17 @@ objects:
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-db
-                key: POSTGRESQL_USER
+                key: database-user
           - name: POSTGRESQL_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-db
-                key: POSTGRESQL_PASSWORD
+                key: database-password
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-db
-                key: POSTGRESQL_DATABASE
+                key: database-name
           image: postgresql
           imagePullPolicy: Always
           livenessProbe:
