@@ -75,16 +75,6 @@ objects:
                 - /opt/eap/bin/jboss-cli.sh
                 - -c
                 - :shutdown(timeout=60)
-          livenessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 120
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 5
           name: ${APPLICATION_NAME}
           ports:
           - containerPort: 8778
@@ -102,8 +92,8 @@ objects:
               path: /
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 40
-            periodSeconds: 5
+            initialDelaySeconds: 30
+            periodSeconds: 1
             successThreshold: 1
             timeoutSeconds: 1
           livenessProbe:
@@ -112,9 +102,9 @@ objects:
               path: /rest/members
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 35
-            periodSeconds: 2
-            successThreshold: 1
+            initialDelaySeconds: 120
+            periodSeconds: 3
+            successThreshold: 3
             timeoutSeconds: 1
           resources:
             limits:
