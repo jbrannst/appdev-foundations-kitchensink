@@ -5,8 +5,8 @@ node('maven') {
    def TEST_PROJECT="ks-test"
    def PROD_PROJECT="ks-prod"
    def APPLICATION="kitchensink"
-   def ARTIFACT="booster-rest-http-spring-boot-1.0.0-SNAPSHOT.jar"
-   def S2I_BUILDER="redhat-openjdk18-openshift"
+   def ARTIFACT="jboss-kitchensink-angularjs.war"
+   def S2I_BUILDER="jboss-eap70-openshift"
 
    checkout scm
    stage ('Build') {
