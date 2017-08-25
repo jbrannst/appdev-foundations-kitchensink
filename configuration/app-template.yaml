@@ -104,7 +104,7 @@ objects:
               scheme: HTTP
             initialDelaySeconds: 120
             periodSeconds: 3
-            successThreshold: 3
+            successThreshold: 1
             timeoutSeconds: 1
           resources:
             limits:
