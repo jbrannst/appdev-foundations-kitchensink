@@ -14,55 +14,63 @@ metadata:
   name: kitchensink-postgres
 objects:
 - apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${APPLICATION_NAME}-db
+  stringData:
+    database-password: ${POSTGRESQL_PASSWORD}
+    database-name: ${POSTGRESQL_DATABASE}
+    database-user: ${POSTGRESQL_USER}
+- apiVersion: v1
   kind: Service
   metadata:
     annotations:
       description: The database server's port.
     labels:
-      application: ${APPLICATION_NAME}-${APPLICATION_ENV}
-    name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+      application: ${APPLICATION_NAME}-db
+    name: ${APPLICATION_NAME}-db
   spec:
     ports:
     - port: 5432
       targetPort: 5432
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+      deploymentConfig: ${APPLICATION_NAME}-db
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
-      application: ${APPLICATION_NAME}-${APPLICATION_ENV}
-    name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+      application: ${APPLICATION_NAME}-db
+    name: ${APPLICATION_NAME}-db
   spec:
     replicas: 1
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+      deploymentConfig: ${APPLICATION_NAME}-db
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          application: ${APPLICATION_NAME}-${APPLICATION_ENV}
-          deploymentConfig: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
-        name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+          application: ${APPLICATION_NAME}-db
+          deploymentConfig: ${APPLICATION_NAME}-db
+        name: ${APPLICATION_NAME}-db
       spec:
         containers:
         - env:
           - name: POSTGRESQL_USER
             valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_USERNAME
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: POSTGRESQL_USER
           - name: POSTGRESQL_PASSWORD
             valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_PASSWORD
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: POSTGRESQL_PASSWORD
           - name: POSTGRESQL_DATABASE
             valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_DATABASE
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: POSTGRESQL_DATABASE
           image: postgresql
           imagePullPolicy: Always
           livenessProbe:
@@ -70,7 +78,7 @@ objects:
             tcpSocket:
               port: 5432
             timeoutSeconds: 1
-          name: ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+          name: ${APPLICATION_NAME}-db
           ports:
           - containerPort: 5432
             protocol: TCP
@@ -96,7 +104,7 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - ${APPLICATION_NAME}-${APPLICATION_ENV}-postgresql
+        - ${APPLICATION_NAME}-db
         from:
           kind: ImageStreamTag
           name: postgresql:latest
@@ -107,6 +115,19 @@ parameters:
 - displayName: Application name
   name: APPLICATION_NAME
   value: ks
-- displayName: Application environment
-  name: APPLICATION_ENV
-  value: test
+- displayName: Postgresql database name
+  name: POSTGRESQL_DATABASE
+  value: ksdatabase
+- description: Username for Postgres user that will be used for accessing the database.
+  displayName: Postgres Connection Username
+  from: user[A-Z0-9]{3}
+  generate: expression
+  name: POSTGRESQL_USER
+  required: true
+- description: Password for the Postgres connection user.
+  displayName: Postgres Connection Password
+  from: '[a-zA-Z0-9]{16}'
+  generate: expression
+  name: POSTGRESQL_PASSWORD
+  required: true
+
