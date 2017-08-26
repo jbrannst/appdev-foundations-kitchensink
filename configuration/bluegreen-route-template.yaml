@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Template
 labels:
-  application: ${APPLICATION_NAME}
+  application: kitchensink
 metadata:
   annotations:
-    description: ${APPLICATION_NAME} route
+    description: kitchensink route
     iconClass: icon-java
     tags: blue-green
   name: production-route
@@ -12,7 +12,7 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ${APPLICATION_NAME}
+    name: production-route
   spec:
     port:
       targetPort: 8080
