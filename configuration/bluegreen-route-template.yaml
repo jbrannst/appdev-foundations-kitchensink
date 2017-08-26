@@ -7,7 +7,7 @@ metadata:
     description: ${APPLICATION_NAME} route
     iconClass: icon-java
     tags: blue-green
-  name: ${APPLICATION_NAME}-route
+  name: production-route
 objects:
 - apiVersion: v1
   kind: Route
@@ -18,11 +18,11 @@ objects:
       targetPort: 8080
     to:
       kind: Service
-      name: ${APPLICATION_NAME}-${APPLICATION_ENV}
+      name: ${APPLICATION_NAME}-${APPLICATION_INSTANCE}
       weight: 100
 parameters:
-- displayName: Application env
-  name: APPLICATION_ENV
+- displayName: Application instance
+  name: APPLICATION_INSTANCE
   value: blue
 - displayName: Application name
   name: APPLICATION_NAME
