@@ -49,11 +49,20 @@ objects:
         containers:
         - env:
           - name: POSTGRESQL_USER
-            value: ${DB_USERNAME}
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: database-user
           - name: POSTGRESQL_PASSWORD
-            value: ${DB_PASSWORD}
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: database-password
           - name: POSTGRESQL_DATABASE
-            value: ${DB_DATABASE}
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-db
+                key: database-name
           image: postgresql
           imagePullPolicy: Always
           livenessProbe:
@@ -98,17 +107,3 @@ parameters:
 - displayName: Application name
   name: APPLICATION_NAME
   value: ks
-- displayName: Database user name
-  from: user[a-zA-Z0-9]{3}
-  generate: expression
-  name: DB_USERNAME
-  required: true
-- displayName: Database user password
-  from: '[a-zA-Z0-9]{8}'
-  generate: expression
-  name: DB_PASSWORD
-  required: true
-- displayName: Application database
-  name: DB_DATABASE
-  value: kitchensinkdb
-  required: true
