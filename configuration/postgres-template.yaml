@@ -5,72 +5,55 @@
 apiVersion: v1
 kind: Template
 labels:
-  application: kitchensink-postgres
+  application: kitchensink
 metadata:
   annotations:
     description: Kitchensink application
     iconClass: icon-java
     tags: javaee,jboss,angularjs
-  name: kitchensink-postgres
+  name: kitchensink-deploy
 objects:
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: ${APPLICATION_NAME}-db
-  stringData:
-    database-password: ${POSTGRESQL_PASSWORD}
-    database-name: ${POSTGRESQL_DATABASE}
-    database-user: ${POSTGRESQL_USER}
 - apiVersion: v1
   kind: Service
   metadata:
     annotations:
       description: The database server's port.
     labels:
-      application: ${APPLICATION_NAME}-db
-    name: ${APPLICATION_NAME}-db
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-postgresql
   spec:
     ports:
     - port: 5432
       targetPort: 5432
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-db
+      deploymentConfig: ${APPLICATION_NAME}-postgresql
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
-      application: ${APPLICATION_NAME}-db
-    name: ${APPLICATION_NAME}-db
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-postgresql
   spec:
     replicas: 1
     selector:
-      deploymentConfig: ${APPLICATION_NAME}-db
+      deploymentConfig: ${APPLICATION_NAME}-postgresql
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          application: ${APPLICATION_NAME}-db
-          deploymentConfig: ${APPLICATION_NAME}-db
-        name: ${APPLICATION_NAME}-db
+          application: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}-postgresql
+        name: ${APPLICATION_NAME}-postgresql
       spec:
         containers:
         - env:
           - name: POSTGRESQL_USER
-            valueFrom:
-              secretKeyRef:
-                name: ${APPLICATION_NAME}-db
-                key: database-user
+            value: ${DB_USERNAME}
           - name: POSTGRESQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ${APPLICATION_NAME}-db
-                key: database-password
+            value: ${DB_PASSWORD}
           - name: POSTGRESQL_DATABASE
-            valueFrom:
-              secretKeyRef:
-                name: ${APPLICATION_NAME}-db
-                key: database-name
+            value: ${DB_DATABASE}
           image: postgresql
           imagePullPolicy: Always
           livenessProbe:
@@ -78,7 +61,7 @@ objects:
             tcpSocket:
               port: 5432
             timeoutSeconds: 1
-          name: ${APPLICATION_NAME}-db
+          name: ${APPLICATION_NAME}-postgresql
           ports:
           - containerPort: 5432
             protocol: TCP
@@ -104,7 +87,7 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - ${APPLICATION_NAME}-db
+        - ${APPLICATION_NAME}-postgresql
         from:
           kind: ImageStreamTag
           name: postgresql:latest
@@ -115,19 +98,17 @@ parameters:
 - displayName: Application name
   name: APPLICATION_NAME
   value: ks
-- displayName: Postgresql database name
-  name: POSTGRESQL_DATABASE
-  value: ksdatabase
-- description: Username for Postgres user that will be used for accessing the database.
-  displayName: Postgres Connection Username
-  from: user[A-Z0-9]{3}
+- displayName: Database user name
+  from: user[a-zA-Z0-9]{3}
   generate: expression
-  name: POSTGRESQL_USER
+  name: DB_USERNAME
   required: true
-- description: Password for the Postgres connection user.
-  displayName: Postgres Connection Password
-  from: '[a-zA-Z0-9]{16}'
+- displayName: Database user password
+  from: '[a-zA-Z0-9]{8}'
   generate: expression
-  name: POSTGRESQL_PASSWORD
+  name: DB_PASSWORD
   required: true
-
+- displayName: Application database
+  name: DB_DATABASE
+  value: kitchensinkdb
+  required: true
