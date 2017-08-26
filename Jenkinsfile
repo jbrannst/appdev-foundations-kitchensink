@@ -76,8 +76,10 @@ node('maven') {
 }
 def deploy(namespace, application, flavor = "test", version = "latest") {
   sh "oc process -f configuration/db-secret-template.yaml -p APPLICATION_NAME=${application}-${flavor} | oc apply -f -  -n ${namespace}"
-  sh "oc process -f configuration/postgres-template.yaml -p APPLICATION_NAME=${application}-${flavor} | oc create -f -  -n ${namespace} || true"
+  sh "oc process -f configuration/postgres-template.yaml -p APPLICATION_NAME=${application}-${flavor} | oc apply -f -  -n ${namespace}"
+  openshiftVerifyDeployment(deploymentConfig: "${application}-${flavor}-postgresql", namespace: "${namespace}")
   sh "oc process -f configuration/app-template.yaml -p IMAGE_VERSION=${version} APPLICATION_NAME=${application}-${flavor} | oc apply -f -  -n ${namespace}"
+  openshiftVerifyDeployment(deploymentConfig: "${application}-${flavor}", namespace: "${namespace}")
 }
 def verify(namespace, application, flavor = "test") {
   openshiftVerifyDeployment(deploymentConfig: "${application}-${flavor}", namespace: "${namespace}")
