@@ -46,9 +46,9 @@ objects:
           - name: AUTO_DEPLOY_EXPLODED
             value: "false"
           - name: DB_SERVICE_PREFIX_MAPPING
-            value: ${APPLICATION_NAME}-db=DB
+            value: ${APPLICATION_NAME}-postgresql=DB
           - name: TX_DATABASE_PREFIX_MAPPING
-            value: ${APPLICATION_NAME}-db=DB
+            value: ${APPLICATION_NAME}-postgresql=DB
           - name: DB_JNDI
             value: java:jboss/datasources/KitchensinkAngularJSQuickstartDS
           - name: DB_USERNAME
