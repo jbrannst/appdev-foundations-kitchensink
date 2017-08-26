@@ -12,7 +12,7 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: production-route
+    name: ${APPLICATION_NAME}
   spec:
     port:
       targetPort: 8080
