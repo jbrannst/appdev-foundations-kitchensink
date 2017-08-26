@@ -71,7 +71,7 @@ node('maven') {
      
      deploy("${PROD_PROJECT}", "${APPLICATION}", "${TARGET}", "${VERSION}")
      verify("${PROD_PROJECT}", "${APPLICATION}", "${TARGET}")
-     sh "oc process -f configuration/bluegreen-route-template.yaml -p TARGET_SERVICE=${APPLICATION}-${TARGET} | oc apply -f -  -n ${PROD_PROJECT}"
+     sh "oc process -f configuration/bluegreen-route-template.yaml -p  APPLICATION_INSTANCE=${TARGET} APPLICATION_NAME=${APPLICATION} | oc apply -f -  -n ${PROD_PROJECT}"
    }
 }
 def deploy(namespace, application, flavor = "test", version = "latest") {
