@@ -2,11 +2,13 @@
 node('maven') {
  // maven-settings should point to local nexus
    def mvnCmd = "mvn -s configuration/maven-settings.xml"
-   def TEST_PROJECT="ks-test"
-   def PROD_PROJECT="ks-prod"
    def APPLICATION="kitchensink"
    def ARTIFACT="jboss-kitchensink-angularjs.war"
    def S2I_BUILDER="jboss-eap70-openshift"
+
+ // fetch project configuration from parameters if available
+   def TEST_PROJECT=params.TEST_PROJECT_PARAM == null ? "ks-test" : params.TEST_PROJECT_PARAM
+   def PROD_PROJECT=params.PROD_PROJECT_PARAM == null ? "ks-prod" : params.PROD_PROJECT_PARAM
 
    checkout scm
    stage ('Build') {
