@@ -7,8 +7,8 @@ node('maven') {
    def S2I_BUILDER="jboss-eap70-openshift"
 
  // fetch project configuration from parameters if available
-   def TEST_PROJECT=params.TEST_PROJECT_PARAM == null ? "ks-test" : params.TEST_PROJECT_PARAM
-   def PROD_PROJECT=params.PROD_PROJECT_PARAM == null ? "ks-prod" : params.PROD_PROJECT_PARAM
+   def TEST_PROJECT=params.TEST_PROJECT_PARAM == null ? "test" : params.TEST_PROJECT_PARAM
+   def PROD_PROJECT=params.PROD_PROJECT_PARAM == null ? "prod" : params.PROD_PROJECT_PARAM
 
    checkout scm
    stage ('Build') {
