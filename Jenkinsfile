@@ -85,6 +85,9 @@ def deploy(namespace, application, flavor = "test", version = "latest") {
 }
 def verify(namespace, application, flavor = "test") {
   openshiftVerifyDeployment(deploymentConfig: "${application}-${flavor}", namespace: "${namespace}")
-  sh "curl -H \"Content-Type: application/json\" -X POST -d \'{\"name\":\"John Smith\",\"email\":\"john.smith@xyz.com\",\"phoneNumber\":\"1234567890\"}\' http://kitchensink-${flavor}.${namespace}.svc.cluster.local:8080/rest/members"
-  sh "curl http://kitchensink-${flavor}.${namespace}.svc.cluster.local:8080/rest/members | grep -q \"John Smith\""
-}
+  URL =  sh ( 
+        script: "oc get routes | grep kitchensink-test | awk '{print \$2}'", 
+        returnStdout: true 
+     ).trim()
+  sh "curl -H \"Content-Type: application/json\" -X POST -d \'{\"name\":\"John Smith\",\"email\":\"john.smith@xyz.com\",\"phoneNumber\":\"1234567890\"}\' http://${URL}/rest/members"
+  sh "curl http://${URL}/rest/members | grep -q \"John Smith\""}
