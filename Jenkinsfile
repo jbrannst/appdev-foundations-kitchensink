@@ -4,7 +4,7 @@ node('maven') {
    def mvnCmd = "mvn -s configuration/maven-settings.xml"
    def APPLICATION="kitchensink"
    def ARTIFACT="jboss-kitchensink-angularjs.war"
-   def S2I_BUILDER="jboss-eap70-openshift"
+   def S2I_BUILDER="jboss-eap70-openshift:1.5"
 
  // fetch project configuration from parameters if available
    def TEST_PROJECT=params.TEST_PROJECT_PARAM == null ? "test" : params.TEST_PROJECT_PARAM
